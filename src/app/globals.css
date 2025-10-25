@@ -7,3 +7,11 @@ html,body,#_next {
   background-color: #000000;
   color: #ffffff;
 }
+
+html.dark {
+  background-color: #000000;
+}
+
+body {
+  background-color: #000000;
+}
