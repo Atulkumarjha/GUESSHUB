@@ -304,3 +304,5 @@ export function DottedGlowBackground({
     </div>
   );
 }
+
+export DottedGlowBackground;

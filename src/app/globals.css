@@ -5,12 +5,5 @@
 html,body,#_next {
   height: 100%;
   background-color: #000000;
-}
-
-html.dark {
-  background-color: #000000;
-}
-
-body {
-  background-color: #000000;
+  color: #ffffff;
 }
