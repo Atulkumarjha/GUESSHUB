@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import AuthSessionProvider from "../../components/providers/session-provider";
+import Link from "next/link";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,6 +30,16 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased relative bg-black text-white`}
       >
         <AuthSessionProvider>
+          <nav className="border-b border-gray-800 px-6 py-4">
+            <div className="max-w-7xl mx-auto flex items-center">
+              <Link href="/" className="text-xl font-bold mr-8">
+                GuessHub
+              </Link>
+              <Link href="/categories" className="mr-4">
+                Categories
+              </Link>
+            </div>
+          </nav>
           <div className="relative z-10">{children}</div>
         </AuthSessionProvider>
       </body>
