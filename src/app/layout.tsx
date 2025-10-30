@@ -35,6 +35,10 @@ export default function RootLayout({
               <Link href="/" className="text-xl font-bold mr-8">
                 GuessHub
               </Link>
+              <Link href="/markets" className="mr-4 hover:text-gray-300">
+                Markets
+              </Link>
+              <Link href="/categories" className="mr-4 hover:text-gray-300">
               <Link href="/categories" className="mr-4">
                 Categories
               </Link>
