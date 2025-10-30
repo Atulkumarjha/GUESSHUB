@@ -1,22 +1,38 @@
-import { Schema, model, models } from "mongoose";
+import mongoose, { Schema, model, models } from "mongoose";
 
-const marketSchema = new Schema(
+export interface IMarket extends Document {
+  title: string;
+  description?: string;
+  category: mongoose.Types.ObjectId;
+  endDate: Date;
+  yesPrice: number;
+  noPrice: number;
+  totalLiquidity: number;
+  status: "open" | "closed" | "resolved";
+  outcome?: "yes" | "no";
+}
+
+const marketSchema = new Schema<IMarket>(
   {
     title: { type: String, required: true },
-    description: String,
-    outcomes: { type: [String], default: ["YES", "NO"] },
-    pool: {
-      YES: { type: Number, default: 0 },
-      NO: { type: Number, default: 0 },
-      b: { type: Number, default: 100 },
+    description: { type: String },
+    category: { type: Schema.Types.ObjectId, ref: "Category", required: true },
+    endDate: { type: Date, required: true },
+    yesPrice: { type: Number, default: 0.5 },
+    noPrice: { type: Number, default: 0.5 },
+    totalLiquidity: { type: Number, default: 1000 },
+    status: {
+      type: String,
+      enum: ["open", "closed", "resolved"],
+      default: "open",
     },
-    status: { type: String, default: "open" },
-    resolution: { type: String, default: "" },
-    creatorId: String,
-    resolveAt: Date,
+    outcome: {
+      type: String,
+      enum: ["yes", "no"],
+    },
   },
   { timestamps: true }
 );
 
-const Market = models.Market || model("market", marketSchema);
+const Market = models.Market || model("Market", marketSchema);
 export default Market;

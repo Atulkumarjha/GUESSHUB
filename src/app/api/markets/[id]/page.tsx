@@ -51,6 +51,7 @@ export default function MarketDetails() {
       } else {
         setMessage(res.data.error || "Something went wrong.");
       }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       setMessage(err.response?.data?.error || "Something went wrong.");
     } finally {
