@@ -39,6 +39,7 @@ export default function RootLayout({
                 Markets
               </Link>
               <Link href="/categories" className="mr-4 hover:text-gray-300">
+              <Link href="/categories" className="mr-4">
                 Categories
               </Link>
             </div>

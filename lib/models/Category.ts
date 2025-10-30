@@ -17,3 +17,22 @@ const CategorySchema = new Schema<ICategory>(
 
 export default mongoose.models.Category ||
   mongoose.model<ICategory>("Category", CategorySchema);
+  description: string;
+}
+
+const CategorySchema = new Schema<ICategory>(
+  {
+    name: { type: String, required: true, unique: true },
+    slug: { type: String, required: true, unique: true },
+  },
+  { timestamps: true }
+);
+
+export default mongoose.models.Category ||
+  mongoose.model<ICategory>("Category", CategorySchema);
+    name: string;
+    slug: string;
+    description: string;
+}
+
+const Category
