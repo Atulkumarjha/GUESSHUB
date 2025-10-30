@@ -41,6 +41,7 @@ export default function HomePage() {
         height={80}
       />
       <Link href="/markets" className="text-blue-600 underline"></Link>
+      <a href="/markets" className="text-blue-600 underline"></a>
       <Image src={user.image || ""} alt="avatar" className="w-20 h-20 rounded-full" width={80} height={80} />
       <h2 className="text-2xl font-semibold">{user.name}</h2>
       <p>Email: {user.email}</p>

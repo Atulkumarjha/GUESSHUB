@@ -16,3 +16,9 @@ const CategorySchema = new Schema<ICategory>(
 
 export default mongoose.models.Category ||
   mongoose.model<ICategory>("Category", CategorySchema);
+    name: string;
+    slug: string;
+    description: string;
+}
+
+const Category
