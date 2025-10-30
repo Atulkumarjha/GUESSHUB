@@ -2,6 +2,7 @@
 
 import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function HomePage() {
   const { data: session } = useSession();
@@ -31,6 +32,14 @@ export default function HomePage() {
       <h2 className="text-2xl font-semibold">{user.name}</h2>
       <p>Email: {user.email}</p>
       <p className="text-green-600 font-medium">Balance: ${user.balance}</p>
+      <Link href="/markets" className="text-blue-600 underline">View Markets</Link>
+      <Image
+        src={user.image || ""}
+        alt="avatar"
+        className="w-20 h-20 rounded-full"
+        width={80}
+        height={80}
+      />
       <a href="/markets" className="text-blue-600 underline"></a>
       <Image src={user.image || ""} alt="avatar" className="w-20 h-20 rounded-full" width={80} height={80} />
       <h2 className="text-2xl font-semibold">{user.name}</h2>
