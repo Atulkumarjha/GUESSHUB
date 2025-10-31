@@ -37,6 +37,16 @@ export async function POST(req: Request) {
       );
     }
 
+    if (new Date() > new Date(market.endDate)) {
+      market.status = "closed";
+      await market.save();
+
+      return NextResponse.json(
+        { status: "error", message: "Marked expired" },
+        { status: 400 }
+      );
+    }
+
     const price = outcome === "yes" ? market.yesPrice : market.noPrice;
     const cost = price * shares;
 
