@@ -48,20 +48,6 @@ export default function HomePage() {
         </Link>
       </div>
 
-      <Link href="/markets" className="text-blue-600 underline">View Markets</Link>
-      <Image
-        src={user.image || ""}
-        alt="avatar"
-        className="w-20 h-20 rounded-full"
-        width={80}
-        height={80}
-      />
-      <Link href="/markets" className="text-blue-600 underline"></Link>
-      <a href="/markets" className="text-blue-600 underline"></a>
-      <Image src={user.image || ""} alt="avatar" className="w-20 h-20 rounded-full" width={80} height={80} />
-      <h2 className="text-2xl font-semibold">{user.name}</h2>
-      <p>Email: {user.email}</p>
-      <p className="text-green-600 font-medium">Balance: ${user.balance}</p>
       <button
         onClick={() => signOut()}
         className="px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700 mt-4"
