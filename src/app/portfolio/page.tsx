@@ -14,6 +14,10 @@ export default function PortfolioPage() {
   useEffect(() => {
     load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
+    const loadData = async () => {
+      await load();
+    };
+    loadData();
   }, []);
 
   return (
