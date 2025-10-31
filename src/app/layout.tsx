@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import AuthSessionProvider from "../../components/providers/session-provider";
+import AuthNav from "../../components/AuthNav";
 import Link from "next/link";
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -39,14 +41,14 @@ export default function RootLayout({
                 Markets
               </Link>
               <Link href="/categories" className="mr-4 hover:text-gray-300">
-              <Link href="/categories" className="mr-4">
                 Categories
               </Link>
-              <Link href="/categories" className="mr-4 hover:text-gray-300">
-                Categories
-                </Link>
-                <Link href="/portfolio" className="mr-4">Portfolio</Link>
+              <Link href="/portfolio" className="mr-4">
+                Portfolio
+              </Link>
+              <AuthNav />
             </div>
+            
           </nav>
           <div className="relative z-10">{children}</div>
         </AuthSessionProvider>

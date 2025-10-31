@@ -20,13 +20,8 @@ export default function MarketsPage() {
   };
 
   useEffect(() => {
-    void (async () => {
-      const cats = await fetch("/api/categories").then((r) => r.json());
-      const mks = await fetch("/api/markets").then((r) => r.json());
-
-      setCategories(cats.categories || []);
-      setMarkets(mks.markets || []);
-    })();
+    fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
