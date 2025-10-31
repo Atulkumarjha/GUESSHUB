@@ -42,6 +42,10 @@ export default function RootLayout({
               <Link href="/categories" className="mr-4">
                 Categories
               </Link>
+              <Link href="/categories" className="mr-4 hover:text-gray-300">
+                Categories
+                </Link>
+                <Link href="/portfolio" className="mr-4">Portfolio</Link>
             </div>
           </nav>
           <div className="relative z-10">{children}</div>
