@@ -34,3 +34,36 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+STEP -1
+Initiazation and project setup
+
+STEP-2
+Build auth system and integrated auth options and providers
+
+STEP-3
+Market creation & Listing
+
+STEP-4
+Bet system implementation
+
+STEP-5
+Market Categories
+
+STEP-6
+Market model
+
+STEP-7
+Core trading Logic
+
+STEP-8
+Portfolio, Market Detail, P&L, Auto-Close Logic
+
+STEP-9
+User positions UI (Profile DashBoard)
+
+STEP-10
+Market Page Improvement
+
+STEP-11
+Global Markets Feed Enhancements
