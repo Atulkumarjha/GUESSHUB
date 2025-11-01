@@ -1,157 +1,84 @@
-"use client";
+import connectDB from "../../../lib/db";
+import Market from "../../../lib/models/market";
+import FiltersUI from "./FilterUI";
 
-import { useState, useEffect } from "react";
+interface SearchParams {
+  search?: string;
+  category?: string;
+  sort?: string;
+}
 
-export default function MarketsPage() {
-  const [categories, setCategories] = useState([]);
-  const [markets, setMarkets] = useState([]);
+export default async function MarketsPage({
+  searchParams,
+}: {
+  searchParams: SearchParams;
+}) {
+  await connectDB();
 
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [category, setCategory] = useState("");
-  const [endDate, setEndDate] = useState("");
+  const { search, category, sort } = searchParams;
 
-  const fetchData = async () => {
-    const cats = await fetch("/api/categories").then((r) => r.json());
-    const mks = await fetch("/api/markets").then((r) => r.json());
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const query: any = {};
 
-    setCategories(cats.categories || []);
-    setMarkets(mks.markets || []);
-  };
+  if (search) {
+    query.title = { $regex: search, $options: "i" };
+  }
 
+  if (category) {
+    query.category = category;
+  }
+
+  let marketsQuery = Market.find(query);
+
+  // Sorting logic
+  if (sort === "endingSoon") {
+    marketsQuery = marketsQuery.sort({ endDate: 1 });
+  }
   useEffect(() => {
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const handleSubmit = async (e: any) => {
-    e.preventDefault();
+  if (sort === "liquidity") {
+    marketsQuery = marketsQuery.sort({ totalLiquidity: -1 });
+  }
 
-    await fetch("/api/markets", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        title,
-        description,
-        category,
-        endDate,
-      }),
-    });
+  if (sort === "recent") {
+    marketsQuery = marketsQuery.sort({ createdAt: -1 });
+  }
 
-    setTitle("");
-    setDescription("");
-    setCategory("");
-    setEndDate("");
+  if (sort === "yesPrice") {
+    marketsQuery = marketsQuery.sort({ yesPrice: -1 });
+  }
 
-    fetchData();
-  };
-
-  const buy = async (marketId: string, outcome: "yes" | "no") => {
-    await fetch("/api/trade/buy", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        marketId,
-        outcome,
-        shares: 10, // fixed amount for now
-      }),
-    });
-
-    fetchData();
-  };
+  const markets = await marketsQuery.lean();
 
   return (
-    <div className="p-6">
-      <h1 className="font-bold text-xl mb-4">Create Market</h1>
+    <div className="max-w-4xl mx-auto mt-12 p-6">
+      <FiltersUI />
 
-      <form onSubmit={handleSubmit} className="max-w-sm flex flex-col gap-3">
-        <input
-          className="border border-gray-600 bg-gray-900 text-white p-2 rounded"
-          placeholder="Market Question"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          required
-        />
-
-        <textarea
-          className="border border-gray-600 bg-gray-900 text-white p-2 rounded"
-          placeholder="Details"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-        />
-
-        <select
-          className="border border-gray-600 bg-gray-900 text-white p-2 rounded"
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
-          required
-        >
-          <option value="">Select Category</option>
-          {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-          {categories.map((cat: any) => (
-            <option key={cat._id} value={cat._id}>
-              {cat.name}
-            </option>
-          ))}
-        </select>
-        <input
-          type="datetime-local"
-          className="border border-gray-600 bg-gray-900 text-white p-2 rounded"
-          value={endDate}
-          onChange={(e) => setEndDate(e.target.value)}
-          required
-        />
-
-        <button
-          type="submit"
-          className="bg-green-500 hover:bg-green-600 text-white p-2 rounded"
-        >
-          Create
-        </button>
-      </form>
-
-      <hr className="my-6 border-gray-700" />
-
-      <h2 className="font-semibold text-lg mb-4">Markets</h2>
-      {markets.length === 0 && (
-        <p className="text-gray-400">No markets yet...</p>
-      )}
-      <ul className="space-y-2">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
         {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-        {markets.map((mk: any) => (
-          <li
-            key={mk._id}
-            className="border border-gray-700 p-3 rounded hover:bg-gray-900"
+        {markets.map((m: any) => (
+          <a
+            key={m._id}
+            href={`/market/${m._id}`}
+            className="bg-gray-900 p-5 rounded-lg hover:opacity-80 transition"
           >
-            <div className="font-semibold">⚡ {mk.title}</div>
-            <div className="text-sm text-gray-400">
-              Category: {mk.category?.name || "Uncategorized"}
+            <h2 className="font-semibold text-lg">{m.title}</h2>
+            <p className="opacity-50 text-sm">{m.category}</p>
+
+            <div className="mt-3 text-sm flex gap-4">
+              <span className="text-green-400">YES: {m.yesPrice}</span>
+              <span className="text-red-400">NO: {m.noPrice}</span>
             </div>
-            <div className="text-sm text-gray-500 mb-2">
-              Ends: {mk.endDate ? new Date(mk.endDate).toLocaleString() : "N/A"}
-            </div>
-            <div className="flex gap-2 mt-2">
-              <button
-                onClick={() => buy(mk._id, "yes")}
-                className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 text-sm"
-              >
-                Buy YES ({mk.yesPrice?.toFixed(2) || "0.50"})
-              </button>
-              <button
-                onClick={() => buy(mk._id, "no")}
-                className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 text-sm"
-              >
-                Buy NO ({mk.noPrice?.toFixed(2) || "0.50"})
-              </button>
-            </div>
-          </li>
+
+            <p className="opacity-50 text-xs mt-2">
+              Ends {new Date(m.endDate).toLocaleDateString()}
+            </p>
+          </a>
         ))}
-      </ul>
+      </div>
     </div>
   );
 }

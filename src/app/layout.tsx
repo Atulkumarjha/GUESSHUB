@@ -51,6 +51,7 @@ export default function RootLayout({
                 Categories
                 </Link>
                 <Link href="/portfolio" className="mr-4">Portfolio</Link>
+                <Link href="/markets" className="mr-4">Markets</Link>
             </div>
             
           </nav>
