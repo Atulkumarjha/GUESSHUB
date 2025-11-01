@@ -34,6 +34,10 @@ export default async function MarketsPage({
   if (sort === "endingSoon") {
     marketsQuery = marketsQuery.sort({ endDate: 1 });
   }
+  useEffect(() => {
+    fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   if (sort === "liquidity") {
     marketsQuery = marketsQuery.sort({ totalLiquidity: -1 });
