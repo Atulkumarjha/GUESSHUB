@@ -1,3 +1,5 @@
+"use server";
+
 import connectDB from "../../../../lib/db";
 import Market from "../../../../lib/models/market";
 import Trade from "../../../../lib/models/trade";
@@ -42,6 +44,33 @@ export default async function MarketPage({
     { $group: { _id: null, shares: { $sum: "$shares" } } },
   ]);
 
+  // Calculate 24h ago timestamp for volume calculation
+  const twentyFourHoursAgo = new Date();
+  twentyFourHoursAgo.setHours(twentyFourHoursAgo.getHours() - 24);
+
+  const volume24h = await Trade.aggregate([
+    { $match: { match: market._id, createdAt: { $gte: twentyFourHoursAgo } } },
+    { $group: { _id: null, total: { $sum: "$shares" } } },
+  ]);
+
+  // Get previous trade from 24h ago to calculate price change
+  const previousTrade = await Trade.findOne({
+    market: params.id,
+    createdAt: { $lte: twentyFourHoursAgo },
+  })
+    .sort({ createdAt: -1 })
+    .lean();
+
+  // Calculate price change percentage
+  let priceChange = 0;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  if (previousTrade && (previousTrade as any).price) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const oldPrice = (previousTrade as any).price;
+    priceChange = ((market.yesPrice - oldPrice) / oldPrice) * 100;
+  }
+
+
   return (
     <div className="max-w-3xl mx-auto mt-12 p-6">
       <h1 className="text-2xl font-bold">{market.title}</h1>
@@ -71,6 +100,12 @@ export default async function MarketPage({
         </div>
 
         <div className="p-4 bg-gray-900 rounded-lg">
+          <p className="opacity-50">24h Volume</p>
+          <p className="text-xl font-semibold">{volume24h[0]?.total ?? 0} shares</p>
+        </div>
+
+        <div className="p-4 bg-gray-900 rounded-lg">
+
           <p className="opacity-50">Ends</p>
           <p className="font-semibold">
             {new Date(market.endDate).toLocaleDateString()}
@@ -80,6 +115,21 @@ export default async function MarketPage({
 
       <div className="mt-5 p-4 bg-gray-800 rounded-lg text-sm">
         <p className="opacity-50">Current Price</p>
+        <p className="text-xl font-bold flex gap-2 items-center">
+          YES: {market.yesPrice.toFixed(2)}
+          {priceChange !== 0 && (
+            <span
+              className={`text-sm ${
+                priceChange > 0 ? "text-green-400" : "text-red-400"
+              }`}
+            >
+              {priceChange > 0 ? "+" : ""}
+              {priceChange.toFixed(2)}%
+            </span>
+          )}
+          {!previousTrade && (
+            <span className="text-yellow-400 opacity-50 text-sm">(New)</span>
+          )}
         <p className="text-xl font-bold flex gap-2">
           {market.yesPrice}
           <span className="text-green-400">+2%</span>
@@ -89,6 +139,8 @@ export default async function MarketPage({
       <h2 className="mt-8 font-bold text-lg">Recent Trades</h2>
 
       <div className="space-y-3 mt-3">
+        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+
         {trades.map((t: any) => (
           <div
             key={t._id}

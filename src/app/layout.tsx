@@ -49,6 +49,13 @@ export default function RootLayout({
               <AuthNav />
               <Link href="/categories" className="mr-4 hover:text-gray-300">
                 Categories
+              </Link>
+              <Link href="/portfolio" className="mr-4">
+                Portfolio
+              </Link>
+              <Link href="/markets" className="mr-4">
+                Markets
+              </Link>
                 </Link>
                 <Link href="/portfolio" className="mr-4">Portfolio</Link>
                 <Link href="/markets" className="mr-4">Markets</Link>

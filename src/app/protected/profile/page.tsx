@@ -20,6 +20,9 @@ export default async function ProfilePage() {
       <h1 className="text-2xl font-bold mb-6">Your Positions</h1>
 
       {trades.length === 0 && (
+        <p className="opacity-70">
+          You don&apos;t have any active positions yet.
+        </p>
         <p className="opacity-70">You don&apos;t have any active positions yet.</p>
       )}
 
