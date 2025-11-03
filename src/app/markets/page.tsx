@@ -3,6 +3,7 @@ import Market from "../../../lib/models/market";
 import FiltersUI from "./FilterUI";
 import Trade from "../../../lib/models/trade";
 
+
 interface SearchParams {
   search?: string;
   category?: string;
@@ -40,6 +41,15 @@ export default async function MarketsPage({
     marketsQuery = marketsQuery.sort({ totalLiquidity: -1 });
   }
 
+  useEffect(() => {
+    fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  if (sort === "liquidity") {
+    marketsQuery = marketsQuery.sort({ totalLiquidity: -1 });
+  }
+
   if (sort === "recent") {
     marketsQuery = marketsQuery.sort({ createdAt: -1 });
   }
@@ -68,6 +78,7 @@ export default async function MarketsPage({
   const trendingMarkets = await Market.find({
     _id: { $in: trending.map((t) => t._id) },
   }).lean();
+  const markets = await marketsQuery.lean();
 
   return (
     <div className="max-w-4xl mx-auto mt-12 p-6">
@@ -107,6 +118,11 @@ export default async function MarketsPage({
                 }}
               />
             </div>
+            <div className="mt-3 text-sm flex gap-4">
+              <span className="text-green-400">YES: {m.yesPrice}</span>
+              <span className="text-red-400">NO: {m.noPrice}</span>
+            </div>
+
             <p className="opacity-50 text-xs mt-2">
               Ends {new Date(m.endDate).toLocaleDateString()}
             </p>

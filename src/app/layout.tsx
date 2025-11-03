@@ -5,6 +5,7 @@ import AuthSessionProvider from "../../components/providers/session-provider";
 import AuthNav from "../../components/AuthNav";
 import Link from "next/link";
 
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -55,7 +56,11 @@ export default function RootLayout({
               <Link href="/markets" className="mr-4">
                 Markets
               </Link>
+                </Link>
+                <Link href="/portfolio" className="mr-4">Portfolio</Link>
+                <Link href="/markets" className="mr-4">Markets</Link>
             </div>
+            
           </nav>
           <div className="relative z-10">{children}</div>
         </AuthSessionProvider>

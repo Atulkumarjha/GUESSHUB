@@ -70,6 +70,7 @@ export default async function MarketPage({
     priceChange = ((market.yesPrice - oldPrice) / oldPrice) * 100;
   }
 
+
   return (
     <div className="max-w-3xl mx-auto mt-12 p-6">
       <h1 className="text-2xl font-bold">{market.title}</h1>
@@ -104,6 +105,7 @@ export default async function MarketPage({
         </div>
 
         <div className="p-4 bg-gray-900 rounded-lg">
+
           <p className="opacity-50">Ends</p>
           <p className="font-semibold">
             {new Date(market.endDate).toLocaleDateString()}
@@ -128,6 +130,9 @@ export default async function MarketPage({
           {!previousTrade && (
             <span className="text-yellow-400 opacity-50 text-sm">(New)</span>
           )}
+        <p className="text-xl font-bold flex gap-2">
+          {market.yesPrice}
+          <span className="text-green-400">+2%</span>
         </p>
       </div>
 
@@ -135,6 +140,7 @@ export default async function MarketPage({
 
       <div className="space-y-3 mt-3">
         {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+
         {trades.map((t: any) => (
           <div
             key={t._id}
