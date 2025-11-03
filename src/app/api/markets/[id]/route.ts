@@ -9,14 +9,14 @@ export async function GET(
   try {
     await connectDB();
     const market = await Market.findById(params.id).populate("category");
-    
+
     if (!market) {
       return NextResponse.json(
         { status: "error", message: "Market not found" },
         { status: 404 }
       );
     }
-    
+
     return NextResponse.json({ status: "success", market });
   } catch (err) {
     return NextResponse.json(

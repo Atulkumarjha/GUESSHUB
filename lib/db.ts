@@ -11,7 +11,7 @@ if (!MONGODB_URI) {
 let cached: {
   conn: typeof mongoose | null;
   promise: Promise<typeof mongoose> | null;
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
 } = (global as any)._mongoose;
 
 if (!cached) {

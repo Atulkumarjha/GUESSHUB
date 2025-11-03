@@ -5,13 +5,16 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "../../../../lib/auth-options";
 
 export async function GET() {
-    await connectDB();
-    const session = await getServerSession(authOptions);
+  await connectDB();
+  const session = await getServerSession(authOptions);
 
-    if(!session?.user?.email) {
-        return NextResponse.json({ status: "error", message: "Unauthorized" }, { status: 401 });
-    }
+  if (!session?.user?.email) {
+    return NextResponse.json(
+      { status: "error", message: "Unauthorized" },
+      { status: 401 }
+    );
+  }
 
-    const positions = await Position.find({}).populate("market");
-    return NextResponse.json({ status: "success", positions });
+  const positions = await Position.find({}).populate("market");
+  return NextResponse.json({ status: "success", positions });
 }
