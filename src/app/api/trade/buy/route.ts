@@ -93,6 +93,14 @@ export async function POST(req: Request) {
       market.yesPrice -= bump;
     }
 
+    if (market.status === "resolved") {
+      return NextResponse.json({ error: "Market already resolved" });
+    }
+
+    if (market.endDate < new Date()) {
+      return NextResponse.json({ error: "Market closed" });
+    }
+
     await market.save();
 
     return NextResponse.json({ status: "success", position, market });

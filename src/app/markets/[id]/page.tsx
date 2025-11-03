@@ -130,9 +130,6 @@ export default async function MarketPage({
           {!previousTrade && (
             <span className="text-yellow-400 opacity-50 text-sm">(New)</span>
           )}
-        <p className="text-xl font-bold flex gap-2">
-          {market.yesPrice}
-          <span className="text-green-400">+2%</span>
         </p>
       </div>
 
@@ -140,7 +137,6 @@ export default async function MarketPage({
 
       <div className="space-y-3 mt-3">
         {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-
         {trades.map((t: any) => (
           <div
             key={t._id}

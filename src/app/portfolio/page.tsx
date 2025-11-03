@@ -5,19 +5,13 @@ import { useState, useEffect } from "react";
 export default function PortfolioPage() {
   const [positions, setPositions] = useState([]);
 
-  const load = async () => {
-    const res = await fetch("/api/portfolio");
-    const data = await res.json();
-    setPositions(data.positions);
-  };
-
   useEffect(() => {
-    load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    const loadData = async () => {
-      await load();
+    const load = async () => {
+      const res = await fetch("/api/portfolio");
+      const data = await res.json();
+      setPositions(data.positions);
     };
-    loadData();
+    load();
   }, []);
 
   return (

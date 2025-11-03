@@ -9,7 +9,7 @@ export interface IMarket extends Document {
   noPrice: number;
   totalLiquidity: number;
   status: "open" | "closed" | "resolved";
-  outcome?: "yes" | "no";
+  outcome?: "yes" | "no" | "pending";
 }
 
 const marketSchema = new Schema<IMarket>(
@@ -24,11 +24,11 @@ const marketSchema = new Schema<IMarket>(
     status: {
       type: String,
       enum: ["open", "closed", "resolved"],
-      default: "open",
     },
     outcome: {
       type: String,
-      enum: ["yes", "no"],
+      enum: ["yes", "no", "pending"],
+      default: "pending",
     },
   },
   { timestamps: true }

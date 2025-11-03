@@ -3,7 +3,6 @@ import Market from "../../../lib/models/market";
 import FiltersUI from "./FilterUI";
 import Trade from "../../../lib/models/trade";
 
-
 interface SearchParams {
   search?: string;
   category?: string;
@@ -41,25 +40,12 @@ export default async function MarketsPage({
     marketsQuery = marketsQuery.sort({ totalLiquidity: -1 });
   }
 
-  useEffect(() => {
-    fetchData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  if (sort === "liquidity") {
-    marketsQuery = marketsQuery.sort({ totalLiquidity: -1 });
-  }
-
   if (sort === "recent") {
     marketsQuery = marketsQuery.sort({ createdAt: -1 });
   }
 
   if (sort === "yesPrice") {
     marketsQuery = marketsQuery.sort({ yesPrice: -1 });
-  }
-
-  if (sort === "treding") {
-    marketsQuery = marketsQuery.sort({ volume24h: -1 });
   }
 
   const markets = await marketsQuery.lean();
@@ -78,13 +64,35 @@ export default async function MarketsPage({
   const trendingMarkets = await Market.find({
     _id: { $in: trending.map((t) => t._id) },
   }).lean();
-  const markets = await marketsQuery.lean();
 
   return (
     <div className="max-w-4xl mx-auto mt-12 p-6">
       <FiltersUI />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+      {trendingMarkets.length > 0 && (
+        <div className="mb-8">
+          <h2 className="text-xl font-bold mb-4">🔥 Trending Markets</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+            {trendingMarkets.map((m: any) => (
+              <a
+                key={m._id}
+                href={`/market/${m._id}`}
+                className="bg-gradient-to-br from-blue-900 to-purple-900 p-4 rounded-lg hover:opacity-80 transition"
+              >
+                <h3 className="font-semibold">{m.title}</h3>
+                <div className="mt-2 text-sm flex gap-4">
+                  <span className="text-green-400">YES: {m.yesPrice}</span>
+                  <span className="text-red-400">NO: {m.noPrice}</span>
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <h2 className="text-xl font-bold mb-4">All Markets</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
         {markets.map((m: any) => (
           <a
@@ -95,29 +103,6 @@ export default async function MarketsPage({
             <h2 className="font-semibold text-lg">{m.title}</h2>
             <p className="opacity-50 text-sm">{m.category}</p>
 
-            <h2 className="text-lg font-bold mt-8">Treding Markets</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
-              {trendingMarkets.map((m: any) => (
-                <a
-                  key={m._id}
-                  href={`/market/${m._id}`}
-                  className="bg-gray-900 p-4 rounded-lg hover:opacity-80"
-                >
-                  <h3 className="font-semibold">{m.title}</h3>
-                  <p className="opacity-50 text-sm">{m.category}</p>
-                  <p className="mt-1">YES: {m.yesPrice}</p>
-                </a>
-              ))}
-            </div>
-
-            <div className="mt-2 bg-gray-700 h-2 rounded overflow-hidden">
-              <div
-                className="bg-green-500 h-full"
-                style={{
-                  width: `${Math.min((volumne24h[0]?.total ?? 0) / 5, 100)}%`,
-                }}
-              />
-            </div>
             <div className="mt-3 text-sm flex gap-4">
               <span className="text-green-400">YES: {m.yesPrice}</span>
               <span className="text-red-400">NO: {m.noPrice}</span>
@@ -132,3 +117,4 @@ export default async function MarketsPage({
     </div>
   );
 }
+

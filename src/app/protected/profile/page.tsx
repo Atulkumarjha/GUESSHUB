@@ -23,7 +23,6 @@ export default async function ProfilePage() {
         <p className="opacity-70">
           You don&apos;t have any active positions yet.
         </p>
-        <p className="opacity-70">You don&apos;t have any active positions yet.</p>
       )}
 
       <div className="space-y-4">
