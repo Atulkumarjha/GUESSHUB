@@ -1,63 +1,125 @@
-import { NextResponse } from "next/server"
-import  connectDB from "../../../../../../lib/db"
-import { getServerSession } from "next-auth"
-import { authOptions } from "../../../../../../lib/auth-options"
-import Market from "../../../../../../lib/models/market"
-import User from "../../../../../../lib/models/user"
-import Transaction from "../../../../../../lib/models/Transaction"
+import { NextResponse } from "next/server";
+import connectDB from "../../../../../../lib/db";
+import User from "../../../../../../lib/models/user";
+import Market from "../../../../../../lib/models/market";
+import Position from "../../../../../../lib/models/position";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../../../../../../lib/auth-options";
+import { lmsrBuy, price } from "../../../../../../lib/lmsr";
 
 export async function POST(
-    req: Request,
-    { params }: { params: { id: string } }
+  req: Request,
+  { params }: { params: { id: string } }
 ) {
-    try {
-        const session =  await getServerSession(authOptions);
-        if(!session || session.user?.email) {
-            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-        }
-
-        const { outcome, amount } = await req.json();
-
-        if(!outcome || !amount || amount <= 0) {
-            return NextResponse.json({ error: "Invlaid bet Data"}, { status: 400 })
-        }
-
-        await connectDB();
-
-        const user = await User.findOne({ email: session.user.email });
-        const market = await Market.findById(params.id);
-
-        if(!user || !market) {
-            return NextResponse.json ({ error: "User or Market not found"}, { status: 404 });
-        }
-
-        if(user.balance < amount) {
-            return NextResponse.json ({ erorr: "Insufficient balance"}, { status: 400 });
-        } 
-
-        user.balance -= amount;
-        await user.save();
-
-        if (market.pool[outcome] === undefined) {
-            market.pool[outcome] = 0;
-        }
-        market.pool[outcome] += amount;
-        await market.save();
-
-
-        await Transaction.create({
-            userId: user._id,
-            marketId: market._id,
-            outcome,
-            amount,
-        });
-
-        return NextResponse.json({ success: true, newBalance: user.balance });
-    } catch (err) {
-        console.error(err);
-        return NextResponse.json(
-            { error: (err as Error).message },
-            { status: 500 }
-        );
+  try {
+    await connectDB();
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.email) {
+      return NextResponse.json(
+        { status: "error", message: "Unauthorized" },
+        { status: 401 }
+      );
     }
+
+    const body = await req.json();
+    const { outcome, shares } = body;
+
+    const user = await User.findOne({ email: session.user.email });
+    const market = await Market.findById(params.id);
+
+    if (!market) {
+      return NextResponse.json(
+        { status: "error", message: "Market not found" },
+        { status: 404 }
+      );
+    }
+
+    if (market.status !== "open") {
+      return NextResponse.json(
+        { status: "error", message: "Market is not open for trading" },
+        { status: 400 }
+      );
+    }
+
+    if (new Date() > new Date(market.endDate)) {
+      market.status = "closed";
+      await market.save();
+      return NextResponse.json(
+        { status: "error", message: "Market expired" },
+        { status: 400 }
+      );
+    }
+
+    // Get current pool values
+    const qYes = market.pool.qyes;
+    const qNo = market.pool.qNo;
+    const b = market.pool.b;
+
+    // Calculate cost using LMSR
+    const { costToBuy, newQYes, newQNo } = lmsrBuy(
+      qYes,
+      qNo,
+      outcome.toUpperCase() as "YES" | "NO",
+      shares,
+      b
+    );
+
+    if (user.balance < costToBuy) {
+      return NextResponse.json(
+        { error: "Insufficient Balance" },
+        { status: 400 }
+      );
+    }
+
+    // Deduct cost from user balance
+    user.balance -= costToBuy;
+    await user.save();
+
+    // Update market pool
+    market.pool.qyes = newQYes;
+    market.pool.qNo = newQNo;
+
+    // Calculate and update prices
+    const newPrices = price(newQYes, newQNo, b);
+    market.yesPrice = newPrices.yes;
+    market.noPrice = newPrices.no;
+
+    await market.save();
+
+    // Update or create position
+    let position = await Position.findOne({
+      user: user._id,
+      market: market._id,
+      outcome,
+    });
+
+    if (!position) {
+      position = await Position.create({
+        user: user._id,
+        market: market._id,
+        outcome,
+        shares,
+        avgPrice: costToBuy / shares,
+      });
+    } else {
+      const totalShares = position.shares + shares;
+      position.avgPrice =
+        (position.avgPrice * position.shares + costToBuy) / totalShares;
+      position.shares = totalShares;
+      await position.save();
+    }
+
+    return NextResponse.json({
+      status: "success",
+      position,
+      market,
+      costToBuy,
+    });
+  } catch (error) {
+    console.error("Bet error:", error);
+    return NextResponse.json(
+      { status: "error", message: "Internal server error" },
+      { status: 500 }
+    );
+  }
 }

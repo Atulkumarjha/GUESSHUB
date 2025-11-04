@@ -1,7 +1,7 @@
 import connectDB from "../../../lib/db";
 import Market from "../../../lib/models/market";
 
-export default function AdminPage() {
+export default async function AdminPage() {
   await connectDB();
 
   const markets = await Market.find().lean();
