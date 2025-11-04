@@ -6,7 +6,7 @@ const userSchema = new Schema(
     email: { type: String, unique: true },
     image: String,
     balance: { type: Number, default: 10000 },
-    roe: { type: String, enum: ["user", "admin"], default: "user"},
+    role: { type: String, enum: ["user", "admin"], default: "user"},
   },
   { timestamps: true }
 );

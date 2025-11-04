@@ -67,3 +67,12 @@ Market Page Improvement
 
 STEP-11
 Global Markets Feed Enhancements
+
+STEP-12
+24H Market Tracking
+
+STEP-13
+Settlement Engine
+
+STEP-14
+Implementing LSMR(Logarithmic Market Scoring Rule)

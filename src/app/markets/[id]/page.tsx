@@ -3,6 +3,7 @@
 import connectDB from "../../../../lib/db";
 import Market from "../../../../lib/models/market";
 import Trade from "../../../../lib/models/trade";
+import { price } from "../../../../lib/lmsr";
 
 // Define a Market interface for typing
 interface IMarket {
@@ -11,7 +12,13 @@ interface IMarket {
   description: string;
   totalLiquidity: number;
   yesPrice: number;
+  noPrice: number;
   endDate: string;
+  pool: {
+    qyes: number;
+    qNo: number;
+    b: number;
+  };
 }
 
 export default async function MarketPage({
@@ -69,6 +76,9 @@ export default async function MarketPage({
     const oldPrice = (previousTrade as any).price;
     priceChange = ((market.yesPrice - oldPrice) / oldPrice) * 100;
   }
+
+  // Calculate LMSR prices from pool
+  const lmsrPrices = price(market.pool.qyes, market.pool.qNo, market.pool.b);
 
 
   return (
@@ -131,6 +141,46 @@ export default async function MarketPage({
             <span className="text-yellow-400 opacity-50 text-sm">(New)</span>
           )}
         </p>
+      </div>
+
+      <div className="mt-5 grid grid-cols-2 gap-4">
+        <div className="p-4 bg-gradient-to-br from-green-900/40 to-green-800/20 border border-green-700/30 rounded-lg">
+          <p className="opacity-70 text-xs mb-1">LMSR Price (YES)</p>
+          <p className="text-2xl font-bold text-green-400">
+            {(lmsrPrices.yes * 100).toFixed(2)}%
+          </p>
+          <p className="text-xs opacity-50 mt-1">
+            ${lmsrPrices.yes.toFixed(4)}
+          </p>
+        </div>
+
+        <div className="p-4 bg-gradient-to-br from-red-900/40 to-red-800/20 border border-red-700/30 rounded-lg">
+          <p className="opacity-70 text-xs mb-1">LMSR Price (NO)</p>
+          <p className="text-2xl font-bold text-red-400">
+            {(lmsrPrices.no * 100).toFixed(2)}%
+          </p>
+          <p className="text-xs opacity-50 mt-1">
+            ${lmsrPrices.no.toFixed(4)}
+          </p>
+        </div>
+      </div>
+
+      <div className="mt-4 p-4 bg-gray-900/50 rounded-lg border border-gray-700">
+        <p className="text-xs opacity-50 mb-2">Pool Information</p>
+        <div className="grid grid-cols-3 gap-4 text-sm">
+          <div>
+            <p className="opacity-50 text-xs">YES Shares</p>
+            <p className="font-semibold">{market.pool.qyes.toFixed(2)}</p>
+          </div>
+          <div>
+            <p className="opacity-50 text-xs">NO Shares</p>
+            <p className="font-semibold">{market.pool.qNo.toFixed(2)}</p>
+          </div>
+          <div>
+            <p className="opacity-50 text-xs">Liquidity (b)</p>
+            <p className="font-semibold">{market.pool.b}</p>
+          </div>
+        </div>
       </div>
 
       <h2 className="mt-8 font-bold text-lg">Recent Trades</h2>

@@ -9,8 +9,13 @@ export default function AuthNav() {
   if (!session) return null;
 
   return (
-    <Link href="/profile" className="hover:opacity-70">
-      Profile
-    </Link>
+    <>
+      <Link href="/profile" className="hover:opacity-70">
+        Profile
+      </Link>
+      <Link href="/admin" className="hover:opacity-70">
+        Admin
+      </Link>
+    </>
   );
 }
