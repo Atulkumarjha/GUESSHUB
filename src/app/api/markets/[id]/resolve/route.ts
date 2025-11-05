@@ -4,10 +4,7 @@ import Market from "../../../../../../lib/models/market";
 import Trade from "../../../../../../lib/models/trade";
 import User from "../../../../../../lib/models/user";
 
-export async function POST(
-  req: Request,
-  { params }: { params: { id: string } }
-) {
+export async function POST(req: Request, { params }: any) {
   await connectDB();
 
   const formData = await req.formData();
