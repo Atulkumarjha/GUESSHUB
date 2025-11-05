@@ -3,7 +3,10 @@
 import connectDB from "../../../../lib/db";
 import Market from "../../../../lib/models/market";
 import Trade from "../../../../lib/models/trade";
+import Position from "../../../../lib/models/position";
 import { price } from "../../../../lib/lmsr";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../../../../lib/auth-options";
 
 // Define a Market interface for typing
 interface IMarket {
@@ -14,6 +17,8 @@ interface IMarket {
   yesPrice: number;
   noPrice: number;
   endDate: string;
+  status: "open" | "closed" | "resolved";
+  outcome?: "yes" | "no" | "pending";
   pool: {
     qyes: number;
     qNo: number;
@@ -28,6 +33,8 @@ export default async function MarketPage({
 }) {
   await connectDB();
 
+  const session = await getServerSession(authOptions);
+
   const market = (await Market.findById(params.id).lean()) as IMarket | null;
 
   if (!market) {
@@ -36,6 +43,17 @@ export default async function MarketPage({
         <h1 className="text-2xl font-bold">Market not found</h1>
       </div>
     );
+  }
+
+  // Fetch user position if authenticated
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let userPosition: any = null;
+  if (session?.user?.email) {
+    userPosition = await Position.findOne({
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      user: (session.user as any)._id,
+      market: market._id,
+    }).lean();
   }
 
   const trades = await Trade.find({ market: params.id })
@@ -83,6 +101,25 @@ export default async function MarketPage({
 
   return (
     <div className="max-w-3xl mx-auto mt-12 p-6">
+      {/* Market Status Badge */}
+      {market.status === "resolved" && (
+        <div className="bg-blue-600 text-white px-3 py-1 rounded mb-3 inline-block text-sm">
+          ✅ Resolved — Winner: {market.outcome?.toUpperCase()}
+        </div>
+      )}
+
+      {market.status === "closed" && (
+        <div className="bg-yellow-500 text-black px-3 py-1 rounded mb-3 inline-block text-sm">
+          ⏳ Market Closed — Awaiting Resolution
+        </div>
+      )}
+
+      {market.status === "open" && (
+        <div className="bg-green-600 px-3 py-1 rounded mb-3 inline-block text-sm">
+          🟢 Market Active
+        </div>
+      )}
+
       <h1 className="text-2xl font-bold">{market.title}</h1>
       <p className="opacity-70 mt-2">{market.description}</p>
 
@@ -164,6 +201,41 @@ export default async function MarketPage({
           </p>
         </div>
       </div>
+
+      {/* User Position Display */}
+      {userPosition && (
+        <div className="bg-gray-800 p-4 rounded-lg mt-4">
+          <p className="font-semibold text-lg mb-2">Your Position</p>
+          <p className="text-sm">
+            {userPosition.outcome.toUpperCase()} — {userPosition.shares} shares
+          </p>
+          <p className="text-green-400 mt-2 text-sm">
+            Current Value:{" "}
+            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+            {(userPosition.shares * (lmsrPrices as any)[userPosition.outcome]).toFixed(2)} tokens
+          </p>
+          
+          {market.status === "open" && (
+            <p className="text-blue-300 mt-2 text-sm">
+              Potential Payout: {userPosition.shares} tokens if {userPosition.outcome.toUpperCase()} wins
+            </p>
+          )}
+
+          {market.status === "resolved" && (
+            <p className="mt-2 text-sm">
+              {userPosition.outcome === market.outcome
+                ? `🎉 You won ${userPosition.shares} tokens`
+                : `❌ You lost your stake`}
+            </p>
+          )}
+        </div>
+      )}
+
+      {market.status !== "open" && (
+        <p className="text-red-400 mt-4 font-medium text-center">
+          Trading closed.
+        </p>
+      )}
 
       <div className="mt-4 p-4 bg-gray-900/50 rounded-lg border border-gray-700">
         <p className="text-xs opacity-50 mb-2">Pool Information</p>

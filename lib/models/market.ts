@@ -15,6 +15,7 @@ export interface IMarket extends Document {
     qNo: number;
     b: number;
   };
+  history: Array<{ t: Date; p: number }>;
 }
 
 const marketSchema = new Schema<IMarket>(
@@ -40,6 +41,10 @@ const marketSchema = new Schema<IMarket>(
       qyes: { type: Number, default: 0 },
       qNo: { type: Number, default: 0 },
       b: { type: Number, default: 100 },
+    },
+    history: {
+      type: [{ t: Date, p: Number }],
+      default: [],
     },
   },
   { timestamps: true }
