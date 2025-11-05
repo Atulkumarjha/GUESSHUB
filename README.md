@@ -76,3 +76,8 @@ Settlement Engine
 
 STEP-14
 Implementing LSMR(Logarithmic Market Scoring Rule)
+User's current value of positions
+
+
+STEP-15
+CLEAN UI + LeaderBoard + Sparklines

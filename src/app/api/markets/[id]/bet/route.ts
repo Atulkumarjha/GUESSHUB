@@ -27,6 +27,8 @@ export async function POST(
     const user = await User.findOne({ email: session.user.email });
     const market = await Market.findById(params.id);
 
+    const p = price(market.pool.qYes, market.pool.qNo, market.pool.b).yes;
+
     if (!market) {
       return NextResponse.json(
         { status: "error", message: "Market not found" },
@@ -40,6 +42,13 @@ export async function POST(
         { status: 400 }
       );
     }
+
+    if (market.history) market.history = [];
+    market.history.push({ t: new Date(), p });
+
+    if (market.history.length > 60) market.history = market.history.slice(-60);
+
+    await market.save();
 
     if (new Date() > new Date(market.endDate)) {
       market.status = "closed";

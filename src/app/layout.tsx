@@ -5,7 +5,6 @@ import AuthSessionProvider from "../../components/providers/session-provider";
 import AuthNav from "../../components/AuthNav";
 import Link from "next/link";
 
-
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -42,6 +41,9 @@ export default function RootLayout({
               </Link>
               <Link href="/categories" className="mr-4 hover:text-gray-300">
                 Categories
+              </Link>
+              <Link href="/leaderboard" className="mr-4 hover:text-gray-300">
+                LeaderBoard
               </Link>
               <Link href="/portfolio" className="mr-4">
                 Portfolio

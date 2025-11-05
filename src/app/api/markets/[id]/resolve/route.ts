@@ -4,7 +4,10 @@ import Market from "../../../../../../lib/models/market";
 import Trade from "../../../../../../lib/models/trade";
 import User from "../../../../../../lib/models/user";
 
-export async function POST(req: Request, { params }: any) {
+export async function POST(
+  req: Request,
+  { params }: { params: { id: string } }
+) {
   await connectDB();
 
   const formData = await req.formData();
@@ -20,8 +23,10 @@ export async function POST(req: Request, { params }: any) {
   const trades = await Trade.find({ market: market._id });
 
   for (const t of trades) {
-    if(trades.side === winner) {
-      const payout = trades.shares * 1.0;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if ((t as any).side === winner) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const payout = (t as any).shares * 1.0;
       await User.findByIdAndUpdate(t.user, {
         $inc: { balance: payout },
       });

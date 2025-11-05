@@ -2,6 +2,7 @@ import connectDB from "../../../lib/db";
 import Market from "../../../lib/models/market";
 import FiltersUI from "./FilterUI";
 import Trade from "../../../lib/models/trade";
+import MarketCard from "../../../components/MarketCard";
 
 interface SearchParams {
   search?: string;
@@ -15,6 +16,11 @@ export default async function MarketsPage({
   searchParams: SearchParams;
 }) {
   await connectDB();
+
+  const markets = await Market.find({})
+    .populate("catoegory")
+    .sort({ createdAt: -1 })
+    .lean();
 
   const { search, category, sort } = searchParams;
 
@@ -69,6 +75,14 @@ export default async function MarketsPage({
     <div className="max-w-4xl mx-auto mt-12 p-6">
       <FiltersUI />
 
+      <div className="max-w-5xl mx-auto p-6">
+        <h1 className="text-2xl font-bold mb-4">Markets</h1>
+        <div className="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-3 gap-4">
+          {markets.map((m: any) => 
+            <MarketCard key={m._id} market={m} />
+          )}
+        </div>
+      </div>
       {trendingMarkets.length > 0 && (
         <div className="mb-8">
           <h2 className="text-xl font-bold mb-4">🔥 Trending Markets</h2>
@@ -117,4 +131,3 @@ export default async function MarketsPage({
     </div>
   );
 }
-
