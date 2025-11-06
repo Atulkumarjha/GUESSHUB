@@ -44,7 +44,7 @@ export default function RootLayout({
               </Link>
               <Link href="/leaderboard" className="mr-4 hover:text-gray-300">
                 LeaderBoard
-              </Link>
+                </Link>
               <Link href="/portfolio" className="mr-4">
                 Portfolio
               </Link>

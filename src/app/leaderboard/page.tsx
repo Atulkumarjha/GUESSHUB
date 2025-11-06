@@ -1,5 +1,14 @@
 import Image from "next/image";
 
+interface LeaderboardUser {
+  userId: string;
+  name: string;
+  image?: string;
+  balance: number;
+  ev: number;
+  netWorth: number;
+}
+
 export default async function LeaderboardPage() {
   const res = await fetch(
     `${process.env.NEXT_PUBLIC_BASE_URL ?? ""}/api/leaderboard`,
@@ -22,7 +31,7 @@ export default async function LeaderboardPage() {
             </tr>
           </thead>
           <tbody>
-            {leaderboard.map((u: any, i: number) => (
+            {leaderboard.map((u: LeaderboardUser, i: number) => (
               <tr key={u.userId} className="boder-t">
                 <td className="p-3">{i + 1}</td>
                 <td className="p-3">
