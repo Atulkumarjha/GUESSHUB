@@ -81,3 +81,6 @@ User's current value of positions
 
 STEP-15
 CLEAN UI + LeaderBoard + Sparklines
+
+STEP-16
+Explore TAb & Polish UI
