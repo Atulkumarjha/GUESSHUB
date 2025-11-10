@@ -10,6 +10,23 @@ interface SearchParams {
   sort?: string;
 }
 
+interface MarketData {
+  _id: string;
+  title: string;
+  description?: string;
+  category?: { name?: string };
+  endDate: Date;
+  yesPrice: number;
+  noPrice: number;
+  totalLiquidity: number;
+  pool?: {
+    qYes: number;
+    qNo: number;
+    b: number;
+  };
+  history?: Array<{ t: Date; p: number }>;
+}
+
 export default async function MarketsPage({
   searchParams,
 }: {
@@ -17,15 +34,9 @@ export default async function MarketsPage({
 }) {
   await connectDB();
 
-  const markets = await Market.find({})
-    .populate("catoegory")
-    .sort({ createdAt: -1 })
-    .lean();
-
   const { search, category, sort } = searchParams;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const query: any = {};
+  const query: Record<string, unknown> = {};
 
   if (search) {
     query.title = { $regex: search, $options: "i" };
@@ -35,26 +46,20 @@ export default async function MarketsPage({
     query.category = category;
   }
 
-  let marketsQuery = Market.find(query);
+  let marketsQuery = Market.find(query).populate("category", "name");
 
   // Sorting logic
   if (sort === "endingSoon") {
     marketsQuery = marketsQuery.sort({ endDate: 1 });
-  }
-
-  if (sort === "liquidity") {
+  } else if (sort === "liquidity") {
     marketsQuery = marketsQuery.sort({ totalLiquidity: -1 });
-  }
-
-  if (sort === "recent") {
+  } else if (sort === "recent") {
     marketsQuery = marketsQuery.sort({ createdAt: -1 });
-  }
-
-  if (sort === "yesPrice") {
+  } else if (sort === "yesPrice") {
     marketsQuery = marketsQuery.sort({ yesPrice: -1 });
   }
 
-  const markets = await marketsQuery.lean();
+  const markets = (await marketsQuery.lean()) as unknown as MarketData[];
 
   // Calculate 24h ago timestamp for trending markets
   const twentyFourHoursAgo = new Date();
@@ -67,66 +72,63 @@ export default async function MarketsPage({
     { $limit: 5 },
   ]);
 
-  const trendingMarkets = await Market.find({
+  const trendingMarkets = (await Market.find({
     _id: { $in: trending.map((t) => t._id) },
-  }).lean();
+  })
+    .populate("category", "name")
+    .lean()) as unknown as MarketData[];
 
   return (
-    <div className="max-w-4xl mx-auto mt-12 p-6">
-      <FiltersUI />
-
-      <div className="max-w-5xl mx-auto p-6">
-        <h1 className="text-2xl font-bold mb-4">Markets</h1>
-        <div className="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-3 gap-4">
-          {markets.map((m: any) => 
-            <MarketCard key={m._id} market={m} />
-          )}
-        </div>
-      </div>
-      {trendingMarkets.length > 0 && (
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900">
+      <div className="max-w-7xl mx-auto px-6 py-12">
         <div className="mb-8">
-          <h2 className="text-xl font-bold mb-4">🔥 Trending Markets</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-            {trendingMarkets.map((m: any) => (
-              <a
-                key={m._id}
-                href={`/market/${m._id}`}
-                className="bg-gradient-to-br from-blue-900 to-purple-900 p-4 rounded-lg hover:opacity-80 transition"
-              >
-                <h3 className="font-semibold">{m.title}</h3>
-                <div className="mt-2 text-sm flex gap-4">
-                  <span className="text-green-400">YES: {m.yesPrice}</span>
-                  <span className="text-red-400">NO: {m.noPrice}</span>
-                </div>
-              </a>
+          <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+            Markets
+          </h1>
+          <p className="text-gray-400">
+            Trade on prediction markets and earn rewards
+          </p>
+        </div>
+
+        <FiltersUI />
+
+        {trendingMarkets.length > 0 && (
+          <div className="mb-12">
+            <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
+              <span>🔥</span>
+              <span>Trending Markets</span>
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {trendingMarkets.map((m) => (
+                <MarketCard key={m._id.toString()} market={m} />
+              ))}
+            </div>
+          </div>
+        )}
+
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold">All Markets</h2>
+          <p className="text-gray-400 text-sm mt-1">
+            {markets.length} {markets.length === 1 ? "market" : "markets"}{" "}
+            available
+          </p>
+        </div>
+
+        {markets.length === 0 ? (
+          <div className="text-center py-16 bg-gray-800/30 rounded-2xl border border-gray-700">
+            <div className="text-6xl mb-4">📊</div>
+            <h3 className="text-xl font-semibold mb-2">No markets found</h3>
+            <p className="text-gray-400">
+              Try adjusting your filters or check back later
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {markets.map((m) => (
+              <MarketCard key={m._id.toString()} market={m} />
             ))}
           </div>
-        </div>
-      )}
-
-      <h2 className="text-xl font-bold mb-4">All Markets</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-        {markets.map((m: any) => (
-          <a
-            key={m._id}
-            href={`/market/${m._id}`}
-            className="bg-gray-900 p-5 rounded-lg hover:opacity-80 transition"
-          >
-            <h2 className="font-semibold text-lg">{m.title}</h2>
-            <p className="opacity-50 text-sm">{m.category}</p>
-
-            <div className="mt-3 text-sm flex gap-4">
-              <span className="text-green-400">YES: {m.yesPrice}</span>
-              <span className="text-red-400">NO: {m.noPrice}</span>
-            </div>
-
-            <p className="opacity-50 text-xs mt-2">
-              Ends {new Date(m.endDate).toLocaleDateString()}
-            </p>
-          </a>
-        ))}
+        )}
       </div>
     </div>
   );
