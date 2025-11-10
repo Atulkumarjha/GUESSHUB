@@ -51,7 +51,7 @@ export default async function LeaderboardPage() {
                 <td className="p-3 text-right">{u.balance.toFixed(2)}</td>
                 <td className="p-3 text-right">{u.ev.toFixed(2)}</td>
                 <td className="p-3 text-right font-semibold">
-                  {u.netWorth.toFixed(2)}
+                  {u.netWorth.toFixed(2)}  
                 </td>
               </tr>
             ))}

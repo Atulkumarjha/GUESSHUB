@@ -1,5 +1,5 @@
 import Link from "next/link";
-import Sparkline from "./sparkline";
+import Sparkline from "../components/Sparkline";
 
 export default function MarketCard({ market }: { market: any }) {
   const yesPct = market.pool
