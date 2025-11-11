@@ -2,16 +2,132 @@
 @tailwind components;
 @tailwind utilities;
 
-html,body,#_next {
-  height: 100%;
-  background-color: #000000;
-  color: #ffffff;
+@layer base {
+  :root {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 217.2 91.2% 59.8%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 224.3 76.3% 48%;
+    --radius: 0.5rem;
+
+    /* Neon Colors */
+    --neon-blue: 197 100% 50%; /* #00BFFF */
+    --neon-pink: 300 100% 50%; /* #FF00FF */
+    --neon-green: 90 100% 46%; /* #39FF14 */
+    --neon-purple: 284 98% 53%; /* #BC13FE */
+    --neon-cyan: 180 100% 50%; /* #00FFFF */
+    --neon-red: 0 100% 50%; /* #FF0000 */
+  }
+
+  html, body {
+    height: 100%;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+  }
 }
 
-html.dark {
-  background-color: #000000;
-}
+@layer utilities {
+  @keyframes blob {
+    0%, 100% { 
+      transform: translate(0, 0) scale(1); 
+    }
+    25% { 
+      transform: translate(20px, -50px) scale(1.1); 
+    }
+    50% { 
+      transform: translate(-20px, 20px) scale(0.9); 
+    }
+    75% { 
+      transform: translate(50px, 50px) scale(1.05); 
+    }
+  }
 
-body {
-  background-color: #000000;
+  .animate-blob {
+    animation: blob 7s infinite;
+  }
+
+  .animation-delay-2000 {
+    animation-delay: 2s;
+  }
+
+  .animation-delay-3000 {
+    animation-delay: 3s;
+  }
+
+  .animation-delay-4000 {
+    animation-delay: 4s;
+  }
+
+  @keyframes gradient {
+    0%, 100% { 
+      background-position: 0% 50%; 
+    }
+    50% { 
+      background-position: 100% 50%; 
+    }
+  }
+
+  .animate-gradient {
+    background-size: 200% 200%;
+    animation: gradient 3s ease infinite;
+  }
+
+  @keyframes tilt {
+    0%, 100% { 
+      transform: rotate(-1deg); 
+    }
+    50% { 
+      transform: rotate(1deg); 
+    }
+  }
+
+  .animate-tilt {
+    animation: tilt 10s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { 
+      transform: translateY(0) translateX(0); 
+    }
+    50% { 
+      transform: translateY(-20px) translateX(10px); 
+    }
+  }
+
+  .animate-float {
+    animation: float linear infinite;
+  }
+
+  /* Custom Scrollbar */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: hsl(var(--secondary));
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: hsl(var(--primary));
+    border-radius: 10px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--primary) / 0.8);
+  }
 }
