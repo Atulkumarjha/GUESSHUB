@@ -176,7 +176,22 @@ export default function MarketCard({ market }: { market: MarketCardProps }) {
             →
           </div>
         </div>
+        {market.history && market.history.length > 0 && (
+          <div className="opacity-90">
+            <Sparkline
+              data={market.history.map((d) => ({ t: d.t, p: d.p }))}
+            />
+          </div>
+        )}
       </div>
+
+      {market.totalLiquidity && (
+        <div className="mt-3 pt-3 border-t border-gray-700">
+          <div className="text-xs text-gray-400">
+            Liquidity: <span className="text-white font-semibold">${market.totalLiquidity.toLocaleString()}</span>
+          </div>
+        </div>
+      )}
     </Link>
   );
 }
