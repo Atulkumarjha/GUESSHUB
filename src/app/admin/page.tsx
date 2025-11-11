@@ -2,7 +2,7 @@ import { Shield, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import connectDB from "@/lib/db";
 import Market from "@/lib/models/market";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 
 interface MarketDocument {
   _id: string;
