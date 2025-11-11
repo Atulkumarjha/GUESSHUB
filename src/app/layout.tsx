@@ -1,23 +1,17 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import AuthSessionProvider from "../../components/providers/session-provider";
-import AuthNav from "../../components/AuthNav";
-import Link from "next/link";
+import Navigation from "../../components/Navigation";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter({
   subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  variable: "--font-inter",
 });
 
 export const metadata: Metadata = {
-  title: "GuessHub",
-  description: "A real time bidding app",
+  title: "GuessHub - Prediction Markets",
+  description: "Trade on prediction markets and earn rewards",
 };
 
 export default function RootLayout({
@@ -26,32 +20,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark bg-black">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased relative bg-black text-white`}
-      >
+    <html lang="en" className="dark">
+      <body className={`${inter.variable} antialiased bg-background text-foreground font-sans`}>
         <AuthSessionProvider>
-          <nav className="border-b border-gray-800 px-6 py-4">
-            <div className="max-w-7xl mx-auto flex items-center">
-              <Link href="/" className="text-xl font-bold mr-8">
-                GuessHub
-              </Link>
-              <Link href="/markets" className="mr-4 hover:text-gray-300">
-                Markets
-              </Link>
-              <Link href="/categories" className="mr-4 hover:text-gray-300">
-                Categories
-              </Link>
-              <Link href="/leaderboard" className="mr-4 hover:text-gray-300">
-                LeaderBoard
-                </Link>
-              <Link href="/portfolio" className="mr-4">
-                Portfolio
-              </Link>
-              <AuthNav />
-            </div>
-          </nav>
-          <div className="relative z-10">{children}</div>
+          <Navigation />
+          <main>{children}</main>
         </AuthSessionProvider>
       </body>
     </html>
